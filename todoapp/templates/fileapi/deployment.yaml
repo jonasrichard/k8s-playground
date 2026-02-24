@@ -21,7 +21,7 @@ spec:
       containers:
       - name: fileapi
         image: fileapi:latest
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: {{ .Values.backend.fileapi.port }}
         # env: redis host will be here
