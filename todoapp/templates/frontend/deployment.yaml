@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todoapp-deployment
+  namespace: {{ .Values.frontend.namespace }}
+  labels:
+    app: todoapp
+    version: {{ .Values.frontend.todoapp.version }}
+spec:
+  replicas: {{ .Values.frontend.todoapp.replicas }}
+  selector:
+    matchLabels:
+      app: todoapp
+  template:
+    metadata:
+      labels:
+        app: todoapp
+        version: {{ .Values.frontend.todoapp.version }}
+
+    spec:
+      containers:
+      - name: todoapp
+        image: todolist:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: {{ .Values.frontend.todoapp.port }}
+        # env: url of the backend fileapi service

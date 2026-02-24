@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preact App</title>
+    <script src="https://unpkg.com/preact@10.19.2/dist/preact.umd.js"></script>
+    <script src="https://unpkg.com/preact@10.19.2/hooks/dist/hooks.umd.js"></script>
+    <script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        #app {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    
+    <script type="module">
+        const API_BASE = 'http://fileapi-service/api';
+        //const API_BASE = 'http://localhost:8080/api';
+
+        function KeysTable({ refresh }) {
+            const [keys, setKeys] = preactHooks.useState([]);
+
+            // Fetch keys on mount and when refresh changes
+            preactHooks.useEffect(() => {
+                fetch(API_BASE + '/keys')
+                    .then(res => res.json())
+                    .then(setKeys)
+                    .catch(() => setKeys([]));
+            }, [refresh]);
+
+            if (!keys.length) {
+                return preact.h('p', null, 'No keys found.');
+            }
+
+            return preact.h('table', { border: 1, cellPadding: 8, style: { marginTop: '20px', width: '100%' } },
+                preact.h('thead', null,
+                    preact.h('tr', null,
+                        preact.h('th', null, 'Key')
+                    )
+                ),
+                preact.h('tbody', null,
+                    keys.map(key =>
+                        preact.h('tr', { key },
+                            preact.h('td', null, key)
+                        )
+                    )
+                )
+            );
+        }
+
+        function CreateKeyValuePanel({ onSuccess }) {
+            const [key, setKey] = preactHooks.useState('');
+            const [value, setValue] = preactHooks.useState('');
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                fetch(API_BASE + '/kv', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key, value })
+                }).then(res => {
+                    if (res.ok) {
+                        setKey('');
+                        setValue('');
+                        onSuccess(); // trigger refresh
+                    }
+                });
+            };
+
+            return preact.h('form', { onSubmit: handleSubmit, style: { marginTop: '20px' } },
+                preact.h('input', {
+                    type: 'text',
+                    placeholder: 'Key',
+                    value: key,
+                    onInput: e => setKey(e.target.value),
+                    required: true,
+                    style: { marginRight: '10px' }
+                }),
+                preact.h('input', {
+                    type: 'text',
+                    placeholder: 'Value',
+                    value: value,
+                    onInput: e => setValue(e.target.value),
+                    required: true,
+                    style: { marginRight: '10px' }
+                }),
+                preact.h('button', { type: 'submit' }, 'Create')
+            );
+        }
+
+        function App() {
+            const [refreshKeys, setRefreshKeys] = preactHooks.useState(0);
+
+            return preact.h('div', null,
+                preact.h('h1', null, 'Preact Todo App'),
+                preact.h(CreateKeyValuePanel, { onSuccess: () => setRefreshKeys(r => r + 1) }),
+                preact.h(KeysTable, { refresh: refreshKeys })
+            );
+        }
+
+        preact.render(preact.h(App), document.getElementById('app'));
+    </script>
+</body>
+</html>

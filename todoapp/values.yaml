@@ -1,0 +1,15 @@
+backend:
+  namespace: todo-backend
+
+  fileapi:
+    version: "0.1.0"
+    replicas: 3
+    port: 8080
+
+frontend:
+  namespace: todo-frontend
+
+  todoapp:
+    version: "0.1.0"
+    replicas: 3
+    port: 8080

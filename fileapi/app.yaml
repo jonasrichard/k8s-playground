@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fileapi
+  namespace: backend
+  labels:
+    app: fileapi
+    tier: backend
+  annotations:
+    author: "Richard Jonas"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fileapi
+  template:
+    metadata:
+      labels:
+        app: fileapi
+    spec:
+      containers:
+        - name: fileapi
+          image: fileapi:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fileapi-service
+  namespace: backend
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: fileapi
+

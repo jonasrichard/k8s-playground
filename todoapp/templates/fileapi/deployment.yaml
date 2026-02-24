@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fileapi-deployment
+  namespace: {{ .Values.backend.namespace }}
+  labels:
+    app: fileapi
+    version: {{ .Values.backend.fileapi.version }}
+spec:
+  replicas: {{ .Values.backend.fileapi.replicas }}
+  selector:
+    matchLabels:
+      app: fileapi
+  template:
+    metadata:
+      labels:
+        app: fileapi
+        version: {{ .Values.backend.fileapi.version }}
+
+    spec:
+      containers:
+      - name: fileapi
+        image: fileapi:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: {{ .Values.backend.fileapi.port }}
+        # env: redis host will be here

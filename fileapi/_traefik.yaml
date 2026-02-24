@@ -1,0 +1,15 @@
+# It is not used any longer
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: fileapi
+  namespace: backend
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`fileapi.localhost`)
+      kind: Rule
+      services:
+        - name: fileapi-service
+          port: 80

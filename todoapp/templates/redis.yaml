@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: filecache
+  namespace: {{ .Values.backend.namespace }}
+  labels:
+    app: filecache
+  annotations:
+    author: "Richard Jonas"
+spec:
+  containers:
+  - name: filecache
+    image: redis:latest
+    imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: filecache-service
+  namespace: {{ .Values.backend.namespace }}
+spec:
+  selector:
+    app: filecache
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+  type: ClusterIP
